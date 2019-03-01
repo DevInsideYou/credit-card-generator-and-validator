@@ -10,7 +10,7 @@ sealed trait CreditCard extends Any with Product with Serializable {
     !isValid
 
   final override def toString: String =
-    if(isNotValid) {
+    if (isNotValid) {
       val invalid = Console.RED + "Invalid" + Console.RESET
 
       s"""$invalid credit card number "$number""""
@@ -24,7 +24,7 @@ sealed trait CreditCard extends Any with Product with Serializable {
 }
 
 object CreditCard extends (String => CreditCard) with (() => CreditCard) {
-  final case class   Valid private (number: String) extends AnyVal with CreditCard
+  final case class Valid private (number: String) extends AnyVal with CreditCard
 
   object Valid {
     private[CreditCard] def apply(number: String): Valid =
@@ -39,21 +39,21 @@ object CreditCard extends (String => CreditCard) with (() => CreditCard) {
   }
 
   override def apply(number: String): CreditCard =
-    if(isValid(number))
+    if (isValid(number))
       Valid(number)
     else
       Invalid(number)
 
   private val CheckDigitLength = 1
-  private val MinimumLength    = 13
-  private val MaximumLength    = 19
+  private val MinimumLength = 13
+  private val MaximumLength = 19
 
   private def isValid(number: String): Boolean =
-    number != null                                           &&
-    number.nonEmpty                                          &&
-    number.forall(Character.isDigit)                         &&
-    (MinimumLength to MaximumLength).contains(number.length) &&
-    doesMathCheckOut(number)
+    number != null &&
+      number.nonEmpty &&
+      number.forall(Character.isDigit) &&
+      (MinimumLength to MaximumLength).contains(number.length) &&
+      doesMathCheckOut(number)
 
   private def doesMathCheckOut(number: String): Boolean = {
     val (payload, checkDigit) = split(number)
@@ -64,26 +64,26 @@ object CreditCard extends (String => CreditCard) with (() => CreditCard) {
 
   private def luhn(payload: String): Int =
     payload
-      .reverse               // String
+      .reverse // String
       .map(_.toString.toInt) // IndexedSeq[Int]
-      .zipWithIndex          // IndexedSeq[(Int = Digit, Int = ZeroBasedIndex)] // first element has index zero
+      .zipWithIndex // IndexedSeq[(Int = Digit, Int = ZeroBasedIndex)] // first element has index zero
       .map {
         case (digit, index) =>
-          if(index % 2 == 0)
+          if (index % 2 == 0)
             digit * 2
           else
             digit
-      }                      // IndexedSeq[Int]
+      } // IndexedSeq[Int]
       .map { number =>
-        if(number > 9)
+        if (number > 9)
           number - 9
         else
           number
-      }                      // IndexedSeq[Int = Digit]
+      } // IndexedSeq[Int = Digit]
       .sum
 
   private def split(number: String): (String, Int) = {
-    val payload    = number.dropRight(CheckDigitLength)
+    val payload = number.dropRight(CheckDigitLength)
     val checkDigit = number.takeRight(CheckDigitLength).toInt
     // or          = number.last.toString.toInt
 
@@ -102,15 +102,15 @@ object CreditCard extends (String => CreditCard) with (() => CreditCard) {
         val max: Int = MaximumLength - CheckDigitLength // 18
 
         min + Random.nextInt((max - min) + 1) // 12 to 18
-      // 12 + 0      until  (     6      + 1)
+        // 12 + 0      until  (     6      + 1)
       }
 
       def randomDigit: Int =
         Random.nextInt(10) // 0 to 9
 
-      (1 to length)            // Range.Inclusive
+      (1 to length) // Range.Inclusive
         .map(_ => randomDigit) // IndexedSeq[Int]
-        .mkString              // String
+        .mkString // String
     }
 
     val checkDigit: Int =
@@ -119,12 +119,12 @@ object CreditCard extends (String => CreditCard) with (() => CreditCard) {
     val number: String =
       payload + checkDigit
 
-    if(isValid(number))
+    if (isValid(number))
       number
     else
       // $COVERAGE-OFF$
       sys.error(s"Bug: generated an invalid number: $number")
-      // $COVERAGE-ON$
+    // $COVERAGE-ON$
 
     // Instead of "manually throwing an exception
     // we also could have used the ensuring method like this:

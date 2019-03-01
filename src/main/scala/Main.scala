@@ -9,9 +9,9 @@ object Main {
 
   private def code(args: Array[String]): Unit = {
     args
-      .headOption      // Option[String]
+      .headOption // Option[String]
       .map(CreditCard) // Option[CreditCard]
-      .map(println)    // Option[Unit]
+      .map(println) // Option[Unit]
       .getOrElse(runDemo)
   }
 
@@ -72,13 +72,13 @@ object Main {
         "6011555484292906",
         "6370424233370023",
         "6380761773419647",
-        "6387887062135843",
+        "6387887062135843"
       ).map(CreditCard)
 
     val (valid, invalid) =
       moreFakeCards.partition(_.isValid)
 
-    if(invalid.nonEmpty) {
+    if (invalid.nonEmpty) {
       println()
       invalid foreach println
     }

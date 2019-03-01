@@ -1,30 +1,42 @@
 import org.scalatest._
+import org.scalatest.prop._
 
-class CreditCardSuite extends FunSuite with Matchers {
+import org.scalacheck._
+
+class CreditCardSuite extends FunSuite with Matchers with PropertyChecks {
+  val genValid: Gen[CreditCard] =
+    Arbitrary.arbitrary[Unit].map(_ => CreditCard())
+
+  implicit val arbitraryValid: Arbitrary[CreditCard.Valid] =
+    Arbitrary(genValid.map(_.asInstanceOf[CreditCard.Valid]))
+
   test("Creating a card without passing any number should generate a valid credit card") {
-    CreditCard().isValid shouldBe true
-  }
-
-  test("Creating a card without passing any number should create a card of class CreditCard.Valid") {
-    CreditCard() shouldBe a[CreditCard.Valid]
+    forAll { validCard: CreditCard.Valid =>
+      validCard.isValid shouldBe true
+    }
   }
 
   test("Creating a card manually by passing a valid number should produce a valid credit card") {
-    val validNumber = CreditCard().number
+    forAll { validCard: CreditCard.Valid =>
+      val validNumber = validCard.number
 
-    CreditCard(validNumber).isValid shouldBe true
+      CreditCard(validNumber).isValid shouldBe true
 
-    noException should be thrownBy CreditCard(validNumber).asInstanceOf[CreditCard.Valid]
+      noException should be thrownBy CreditCard(validNumber).asInstanceOf[CreditCard.Valid]
+    }
   }
 
   test("Credit cards toString method should mention validity") {
-    CreditCard("").toString.toLowerCase should include ("invalid")
-    CreditCard().toString.toLowerCase should not include "invalid"
+    CreditCard("").toString.toLowerCase should include("invalid")
+
+    forAll { validCard: CreditCard.Valid =>
+      validCard.toString.toLowerCase should not include "invalid"
+    }
   }
 
   test("All these cards copied from freeformatter.com should be valid") {
-    val fakeCards =
-      Set(
+    val fakeValidCards =
+      Seq(
         "0604326448044080",
         "30166725723574",
         "30257046091021",
@@ -57,15 +69,13 @@ class CreditCardSuite extends FunSuite with Matchers {
         "6011555484292906",
         "6370424233370023",
         "6380761773419647",
-        "6387887062135843",
+        "6387887062135843"
       ).map(CreditCard)
 
-    all(fakeCards.map(_.isValid)) shouldBe true
-  }
+    val gen: Gen[CreditCard] = Gen.oneOf(fakeValidCards)
 
-  test("10k generated cards should all be valid") {
-    val fakeCards = 1 to 10000 map (_ => CreditCard())
-
-    all(fakeCards.map(_.isValid)) shouldBe true
+    forAll { validCard: CreditCard.Valid =>
+      validCard.isValid shouldBe true
+    }
   }
 }

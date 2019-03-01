@@ -10,8 +10,9 @@ resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
 
 libraryDependencies ++=
   Seq(
-    "org.scalatest" %% "scalatest" % "3.0.5" % "test", // http://www.scalatest.org/
-      "org.pegdown"  %   "pegdown" % "1.6.0" % "test"  // https://github.com/sirthias/pegdown/
+     "org.scalatest" %%  "scalatest" %  "3.0.5" % "test", // http://www.scalatest.org/
+    "org.scalacheck" %% "scalacheck" % "1.14.0" % "test",
+       "org.pegdown"  %    "pegdown" %  "1.6.0" % "test"  // https://github.com/sirthias/pegdown/
   )
 
 testOptions in Test ++=
